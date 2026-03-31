@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Secure Pass • Premium Password Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#0f172a; --bg2:#1e293b; --card:#0b1220cc; --text:#e5e7eb; --muted:#94a3b8;
+      --accent:#22d3ee; --accent2:#a78bfa; --danger:#ef4444; --ok:#22c55e;
+    }
+    .light{ --bg1:#eef2ff; --bg2:#e0e7ff; --card:#ffffffcc; --text:#0f172a; --muted:#475569; }
+
+    *{ box-sizing:border-box }
+    body{
+      margin:0; font-family:Inter,system-ui,Arial; color:var(--text);
+      background: radial-gradient(1200px 800px at 20% 10%, #1f2937 0%, transparent 60%),
+                  radial-gradient(1200px 800px at 80% 90%, #312e81 0%, transparent 60%),
+                  linear-gradient(135deg,var(--bg1),var(--bg2));
+      min-height:100vh; display:grid; place-items:center; padding:24px;
+    }
+    .app{
+      width: min(920px, 100%);
+      display:grid; grid-template-columns: 1.1fr .9fr; gap:20px;
+    }
+    @media (max-width:800px){ .app{ grid-template-columns:1fr } }
+
+    .card{
+      background:var(--card); backdrop-filter: blur(16px);
+      border:1px solid #ffffff1a; border-radius:20px; padding:20px;
+      box-shadow: 0 20px 60px #00000040;
+    }
+    h1{ margin:0 0 6px; font-weight:800; letter-spacing:.3px }
+    .sub{ color:var(--muted); font-size:13px }
+
+    .row{ display:flex; gap:10px; align-items:center }
+    .between{ display:flex; justify-content:space-between; align-items:center }
+
+    .input{
+      width:100%; padding:14px 14px; border-radius:14px; border:1px solid #ffffff22;
+      background:#00000022; color:var(--text); outline:none;
+    }
+
+    .btn{
+      padding:12px 14px; border-radius:14px; border:1px solid #ffffff22; cursor:pointer;
+      background: linear-gradient(135deg,var(--accent),var(--accent2)); color:#0b1220; font-weight:700;
+      box-shadow: 0 10px 30px #22d3ee55; transition:.2s transform, .2s box-shadow;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow:0 14px 40px #22d3ee66 }
+    .btn.secondary{ background:#00000022; color:var(--text); box-shadow:none }
+
+    .pill{ padding:8px 10px; border-radius:999px; border:1px solid #ffffff22; background:#00000022; font-size:12px }
+
+    .checks{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px }
+    label{ font-size:14px; color:var(--muted) }
+
+    .output{
+      font-size:18px; letter-spacing:.6px; word-break:break-all;
+      padding:14px; border-radius:14px; background:#00000033; border:1px dashed #ffffff22;
+    }
+
+    .meter{ height:8px; border-radius:999px; background:#00000033; overflow:hidden }
+    .bar{ height:100%; width:0% }
+
+    .history{ max-height:260px; overflow:auto; display:flex; flex-direction:column; gap:8px; margin-top:10px }
+    .item{ padding:10px; border-radius:12px; background:#00000022; border:1px solid #ffffff1a; font-size:13px }
+
+    .toast{ position:fixed; bottom:18px; left:50%; transform:translateX(-50%) translateY(20px);
+      opacity:0; pointer-events:none; transition:.25s; background:#0b1220; color:#fff;
+      padding:10px 14px; border-radius:999px; border:1px solid #ffffff22 }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0) }
+
+    .brand{ font-weight:800; background:linear-gradient(135deg,var(--accent),var(--accent2));
+      -webkit-background-clip:text; background-clip:text; color:transparent }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <div class="between">
+        <div>
+          <h1><span class="brand">Secure Pass</span></h1>
+          <div class="sub">Premium, standalone password generator</div>
+        </div>
+        <button id="themeBtn" class="pill">🌙</button>
+      </div>
+
+      <div class="row" style="margin-top:14px">
+        <input id="out" class="input" placeholder="Click generate…" readonly />
+        <button id="copy" class="btn secondary">Copy</button>
+      </div>
+
+      <div style="margin-top:10px" class="meter"><div id="bar" class="bar"></div></div>
+      <div id="strength" class="sub" style="margin-top:6px">Strength: —</div>
+
+      <div class="row" style="margin-top:14px">
+        <input id="len" class="input" type="number" min="6" max="64" value="14" />
+        <button id="gen" class="btn">Generate</button>
+      </div>
+
+      <div class="checks">
+        <label><input type="checkbox" id="u" checked> Uppercase</label>
+        <label><input type="checkbox" id="l" checked> Lowercase</label>
+        <label><input type="checkbox" id="n" checked> Numbers</label>
+        <label><input type="checkbox" id="s"> Symbols</label>
+        <label><input type="checkbox" id="safe"> Avoid confusing</label>
+        <label><input type="checkbox" id="mem"> Memorable mode</label>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <button id="multi" class="btn secondary">Generate 5</button>
+        <button id="clear" class="btn secondary">Clear history</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="between">
+        <div class="sub">Recent passwords</div>
+        <div class="pill" id="count">0</div>
+      </div>
+      <div id="history" class="history"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Copied</div>
+
+  <script>
+    const el = id => document.getElementById(id);
+    const out = el('out'), bar = el('bar'), strength = el('strength');
+    const historyEl = el('history'), count = el('count');
+
+    const sets = {
+      u: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      l: 'abcdefghijklmnopqrstuvwxyz',
+      n: '0123456789',
+      s: '!@#$%^&*()_+-=[]{};:,.<>?'
+    };
+
+    const safeFilter = str => str.replace(/[O0Il1]/g,'');
+
+    const words = ['Tiger','Nova','Pixel','Orbit','Quantum','Neon','Lunar','Echo','Atlas','Cipher'];
+
+    function pick(str){ return str[Math.floor(Math.random()*str.length)]; }
+
+    function generateOne(){
+      const length = Math.min(64, Math.max(6, +el('len').value || 14));
+      let pool = '';
+      if(el('u').checked) pool += sets.u;
+      if(el('l').checked) pool += sets.l;
+      if(el('n').checked) pool += sets.n;
+      if(el('s').checked) pool += sets.s;
+      if(el('safe').checked) pool = safeFilter(pool);
+
+      if(el('mem').checked){
+        const w1 = words[Math.floor(Math.random()*words.length)];
+        const w2 = words[Math.floor(Math.random()*words.length)];
+        const num = Math.floor(Math.random()*100);
+        const sym = el('s').checked ? pick(sets.s) : '';
+        return (w1 + sym + w2 + num).slice(0, length);
+      }
+
+      if(!pool) return '';
+      let p = '';
+      for(let i=0;i<length;i++) p += pick(pool);
+      return p;
+    }
+
+    function score(p){
+      let s = 0;
+      if(p.length >= 12) s += 2; else if(p.length >= 8) s += 1;
+      if(/[A-Z]/.test(p)) s++;
+      if(/[a-z]/.test(p)) s++;
+      if(/[0-9]/.test(p)) s++;
+      if(/[^A-Za-z0-9]/.test(p)) s++;
+      return Math.min(5, s);
+    }
+
+    function paint(s){
+      const pct = (s/5)*100;
+      bar.style.width = pct + '%';
+      const color = s<=2 ? 'var(--danger)' : s<=3 ? '#f59e0b' : 'var(--ok)';
+      bar.style.background = color;
+      strength.textContent = 'Strength: ' + (s<=2?'Weak':s<=3?'Medium':'Strong');
+    }
+
+    function pushHistory(p){
+      if(!p) return;
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.textContent = p;
+      div.onclick = () => copy(p);
+      historyEl.prepend(div);
+      while(historyEl.children.length>10) historyEl.lastChild.remove();
+      count.textContent = historyEl.children.length;
+    }
+
+    function copy(txt){
+      navigator.clipboard.writeText(txt || out.value);
+      const t = el('toast'); t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'),1200);
+    }
+
+    el('gen').onclick = () => {
+      const p = generateOne(); out.value = p; paint(score(p)); pushHistory(p);
+    };
+
+    el('multi').onclick = () => {
+      for(let i=0;i<5;i++){ const p = generateOne(); pushHistory(p); }
+    };
+
+    el('copy').onclick = () => copy();
+    el('clear').onclick = () => { historyEl.innerHTML=''; count.textContent=0 };
+
+    el('themeBtn').onclick = () => {
+      document.body.classList.toggle('light');
+      el('themeBtn').textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+      localStorage.setItem('theme', document.body.classList.contains('light')?'light':'dark');
+    };
+
+    // restore theme
+    if(localStorage.getItem('theme')==='light'){
+      document.body.classList.add('light'); el('themeBtn').textContent='☀️';
+    }
+  </script>
+</body>
+</html>
