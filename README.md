@@ -2,6 +2,25 @@
 
 A modern, secure, and fully responsive password generator web app with a premium UI/UX, built with DevOps practices including Docker and CI/CD using GitHub Actions.
 
+| **Submitted by** | Anushka Singh (0201AI221018)            |
+|------------------|------------------------------------------|
+| **Semester**     | 8th Sem                                  |
+| **Department**   | Artificial Intelligence and Data Science |
+| **Submitted to** | Prof. Praveen Patel                     |
+
+
+## Assignment Brief
+
+> Create a small web app and apply the following:
+> 1. Dockerize it
+> 2. Push code to GitHub
+> 3. Configure GitHub Actions:
+>    - On push → Run tests
+>    - Build Docker image
+>    - Deploy locally
+
+---
+
 ## ✨ Features
 
 * 🔐 Generate strong, secure passwords
