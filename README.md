@@ -2,6 +2,8 @@
 
 A modern, secure, and fully responsive password generator web app with a premium UI/UX, built with DevOps practices including Docker and CI/CD using GitHub Actions.
 
+---
+
 | **Submitted by** | Anushka Singh (0201AI221018)            |
 |------------------|------------------------------------------|
 | **Semester**     | 8th Sem                                  |
