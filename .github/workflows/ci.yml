@@ -1,20 +1,22 @@
-name: CI/CD Pipeline
+name: Secure Pass CI/CD Pipeline
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Run tests
-        run: echo "No tests yet"
+      - name: 🧪 Run Basic Test
+        run: echo "No tests configured"
 
-      - name: Build Docker image
-        run: docker build -t Secure-Pass .
+      - name: 🐳 Build Docker Image
+        run: docker build -t secure-pass .
 
-      - name: Run container
-        run: docker run -d -p 8080:80 Secure-Pass
+      - name: 🚀 Run Docker Container
+        run: docker run -d -p 8080:80 secure-pass
